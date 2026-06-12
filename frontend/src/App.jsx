@@ -1,9 +1,11 @@
-import React from 'react'
+// src/App.jsx
+import { LoginForm } from './api/components/organisms/LoginForm';
 
-const App = () => {
+function App() {
   return (
-    <div className='bg-amber-400 font-bold text-2xl'>App de prueba</div>
+    <div className="min-h-screen bg-gray-100 flex items-center justify-center p-4">
+      <LoginForm />
+    </div>
   )
 }
-
-export default App
+export default App;
