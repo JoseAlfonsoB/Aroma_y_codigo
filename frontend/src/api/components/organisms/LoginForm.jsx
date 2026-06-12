@@ -48,9 +48,7 @@ export const LoginForm = () => {
 
             <Button type="submit">Entrar</Button>
 
-            <p className="text-center text-sm text-gray-600 mt-4">
-                ¿No tienes cuenta? <span className="text-amber-800 font-bold cursor-pointer">Regístrate aquí</span>
-            </p>
+            
         </form>
     );
 };
