@@ -1,28 +1,18 @@
 // src/App.jsx
-import React, { useState } from 'react';
-import { LoginForm } from './api/components/organisms/LoginForm.jsx';
-import { RegisterForm } from './api/components/organisms/RegisterForm.jsx';
-
+import React from 'react';
+import { ProductGrid } from './api/components/organisms/ProductGrid.jsx';
 function App() {
-  const [isLogin, setIsLogin] = useState(true);
-
   return (
-    <div className="min-h-screen bg-gray-100 flex items-center justify-center p-4">
-      {isLogin ? (
-        // Renderiza el Login y si le da clic a registrarse, cambia el estado
-        <div className="w-full flex flex-col items-center">
-          <LoginForm />
-          <p className="text-sm text-gray-500 mt-4">
-            ¿No tienes cuenta?{' '}
-            <button onClick={() => setIsLogin(false)} className="text-amber-800 font-bold hover:underline">
-              Regístrate aquí
-            </button>
-          </p>
-        </div>
-      ) : (
-        // Renderiza el Registro y permite regresar al Login
-        <RegisterForm onSwitchToLogin={() => setIsLogin(true)} />
-      )}
+    <div className="min-h-screen bg-gray-50">
+      {/* Header Falso para simular el entorno */}
+      <header className="bg-white border-b border-gray-200 py-4 px-6 flex justify-between items-center shadow-sm">
+        <h1 className="text-xl font-black text-amber-900 tracking-wider">AROMA & CÓDIGO</h1>
+        <span className="text-sm bg-amber-100 text-amber-900 px-3 py-1 rounded-full font-medium">Sesión Activa</span>
+      </header>
+
+      <main className="p-4">
+        <ProductGrid />
+      </main>
     </div>
   );
 }
