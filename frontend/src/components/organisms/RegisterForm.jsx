@@ -3,6 +3,7 @@ import { useState, useContext } from 'react';
 import { AuthContext } from '../../context/AuthContext';
 import { Input } from '../atoms/Input';
 import { Button } from '../atoms/Button';
+import { Link } from 'react-router-dom';
 
 export const RegisterForm = ({ onSwitchToLogin }) => {
     const { registro } = useContext(AuthContext);
@@ -67,9 +68,9 @@ export const RegisterForm = ({ onSwitchToLogin }) => {
 
             <p className="text-center text-sm text-gray-600 mt-4">
                 ¿Ya tienes cuenta?{' '}
-                <span onClick={onSwitchToLogin} className="text-amber-800 font-bold cursor-pointer hover:underline">
+                <Link to="/login" className="text-amber-800 font-bold hover:underline">
                     Inicia sesión aquí
-                </span>
+                </Link>
             </p>
         </form>
     );

@@ -2,6 +2,7 @@ import { useState, useContext } from 'react';
 import { AuthContext } from '../../context/AuthContext';
 import { Input } from '../atoms/Input';
 import { Button } from '../atoms/Button';
+import { Link } from 'react-router-dom';
 
 export const LoginForm = () => {
     const { login } = useContext(AuthContext); // Extraemos la función mágica
@@ -47,6 +48,12 @@ export const LoginForm = () => {
 
             <Button type="submit">Entrar</Button>
 
+            <p className="text-center text-sm text-gray-600 mt-4">
+                ¿No tienes cuenta?{' '}
+                <Link to="/register" className="text-amber-800 font-bold hover:underline">
+                    Regístrate aquí
+                </Link>
+            </p>
             
         </form>
     );
