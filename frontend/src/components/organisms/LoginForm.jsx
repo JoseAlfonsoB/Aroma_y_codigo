@@ -2,10 +2,11 @@ import { useState, useContext } from 'react';
 import { AuthContext } from '../../context/AuthContext';
 import { Input } from '../atoms/Input';
 import { Button } from '../atoms/Button';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom'; // 1. Importamos useNavigate
 
 export const LoginForm = () => {
-    const { login } = useContext(AuthContext); // Extraemos la función mágica
+    const { login } = useContext(AuthContext);
+    const navigate = useNavigate(); // 2. Inicializamos el hook de navegación interna
     const [formData, setFormData] = useState({ email: '', password: '' });
     const [error, setError] = useState('');
 
@@ -18,10 +19,11 @@ export const LoginForm = () => {
         setError('');
         try {
             await login(formData.email, formData.password);
-            alert("¡Bienvenido al sistema!");
-            // Aquí podrías usar un hook de navegación como useNavigate de react-router-dom
+
+            // 3. ¡La magia de la SPA! Redirigimos al catálogo sin recargar la página
+            navigate('/catalogo');
         } catch (err) {
-            setError(err.message); // El error que viene desde api.js
+            setError(err.message);
         }
     };
 
@@ -54,7 +56,7 @@ export const LoginForm = () => {
                     Regístrate aquí
                 </Link>
             </p>
-            
+
         </form>
     );
 };
