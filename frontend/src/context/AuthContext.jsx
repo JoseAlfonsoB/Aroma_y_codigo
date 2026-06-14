@@ -56,8 +56,29 @@ export const AuthProvider = ({ children }) => {
         localStorage.removeItem('aroma_user');
     };
 
+    const agregarAlCarrito = async (productoId, cantidad = 1) => {
+        // Si no hay un usuario en el estado, le advertimos que debe loguearse
+        if (!user || !user.id) {
+            throw new Error('Debes iniciar sesión para añadir productos al carrito.');
+        }
+
+        try {
+            // Mandamos el POST estructurado hacia el endpoint carrito.php
+            const response = await apiService.post('carrito', {
+                usuario_id: user.id,
+                producto_id: productoId,
+                cantidad: cantidad
+            });
+
+            return response;
+        } catch (error) {
+            throw error;
+        }
+    };
+
+    // Recuerda agregar la función al return del Provider para que sea pública:
     return (
-        <AuthContext.Provider value={{ user, login, registro, logout, loading }}>
+        <AuthContext.Provider value={{ user, login, registro, logout, agregarAlCarrito, loading }}>
             {!loading && children}
         </AuthContext.Provider>
     );

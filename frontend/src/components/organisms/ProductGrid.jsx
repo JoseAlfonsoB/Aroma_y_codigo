@@ -1,12 +1,15 @@
 // src/components/organisms/ProductGrid.jsx
-import React, { useState, useEffect } from 'react';
-import { apiService } from '../../api';
+import { useState, useEffect, useContext } from 'react';
+import { AuthContext } from '../../context/AuthContext';
+import { apiService } from '../../api/api';
 import { ProductCard } from '../molecules/ProductCard';
 
 export const ProductGrid = () => {
     const [productos, setProductos] = useState([]);
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(true);
+
+    const { agregarAlCarrito } = useContext(AuthContext);
 
     useEffect(() => {
         const cargarProductos = async () => {
@@ -16,7 +19,7 @@ export const ProductGrid = () => {
                     setProductos(response.data);
                 }
             } catch (err) {
-                setError('No se pudo conectar con el catálogo de productos.');
+                setError('No se pudo conectar con el catálogo de productos.',err);
             } finally {
                 setLoading(false);
             }
@@ -25,8 +28,15 @@ export const ProductGrid = () => {
         cargarProductos();
     }, []);
 
-    const handleAgregarCarrito = (producto) => {
-        alert(`Añadiste "${producto.nombre}" al carrito. ¡Pronto conectaremos este botón al endpoint carrito.php!`);
+    const handleAgregarCarrito = async (producto) => {
+        try {
+            const response = await agregarAlCarrito(producto.id, 1);
+            if (response.status === 'success') {
+                alert(`¡"${producto.nombre}" se ha guardado en tu carrito en la Base de Datos!`);
+            }
+        } catch (err) {
+            alert(err.message);
+        }
     };
 
     if (loading) return <p className="text-center text-gray-600 py-10">Cargando exquisito café...</p>;

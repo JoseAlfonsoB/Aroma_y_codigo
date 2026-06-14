@@ -1,5 +1,5 @@
 // src/components/molecules/ProductCard.jsx
-import React from 'react';
+//import React from 'react';
 import { CardButton } from '../atoms/CardButton';
 
 export const ProductCard = ({ producto, onAgregarAlCarrito }) => {

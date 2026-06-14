@@ -1,6 +1,6 @@
 // src/App.jsx
-import React from 'react';
-import { ProductGrid } from './api/components/organisms/ProductGrid.jsx';
+//import React from 'react';
+import { ProductGrid } from './components/organisms/ProductGrid.jsx';
 function App() {
   return (
     <div className="min-h-screen bg-gray-50">
