@@ -3,6 +3,8 @@ import React, { useState, useEffect, useContext } from 'react';
 import { AuthContext } from '../../context/AuthContext';
 import { apiService } from '../../api/api'; // 1. Importamos tu servicio centralizado
 import { Button } from '../atoms/Button';
+// Importamos los botones inteligentes del SDK oficial de PayPal
+import { PayPalButtons } from "@paypal/react-paypal-js";
 
 export const CartList = () => {
     const { user } = useContext(AuthContext);
@@ -42,6 +44,61 @@ export const CartList = () => {
             const cantidad = parseInt(item.cantidad) || 0;
             return acc + (precio * cantidad);
         }, 0).toFixed(2);
+    };
+
+    // Configuración y envío del total dinámico de la orden a la ventana de PayPal
+    const createOrder = (data, actions) => {
+        const total = calcularTotal();
+        return actions.order.create({
+            purchase_units: [
+                {
+                    description: "Compra de especialidades - Tienda Aroma & Código",
+                    amount: {
+                        currency_code: "MXN", // Forzamos que coincida con el proveedor de App.jsx
+                        value: total, // Pasamos el string devuelto por toFixed(2)
+                    },
+                },
+            ],
+        });
+    };
+
+    // Callback activado automáticamente cuando el cliente autoriza el cargo de manera exitosa
+    const onApprove = async (data, actions) => {
+        try {
+            // 1. Capturamos la orden en los servidores de PayPal
+            const details = await actions.order.capture();
+            const totalOrden = calcularTotal();
+
+            // 2. Mapeamos tus cartItems al formato exacto que espera recibir tu backend en PHP
+            // Tu archivo pagos.php necesita: producto_id, cantidad y precio
+            const itemsFormateados = cartItems.map(item => ({
+                producto_id: item.producto_id,
+                cantidad: item.cantidad,
+                precio: parseFloat(item.precio)
+            }));
+
+            // 3. Enviamos la petición POST a pagos.php con la estructura exacta que ya tienes escrita
+            const response = await apiService.post('endpoints/pagos.php', {
+                usuario_id: user.id,
+                total: parseFloat(totalOrden),
+                id_transaccion: details.id,
+                items: itemsFormateados
+            });
+
+            // 4. Validamos la respuesta del backend basada en tu código existente
+            if (response && response.status === 'success') {
+                // Limpiamos el estado en React para vaciar la interfaz de inmediato
+                setCartItems([]);
+
+                alert(`¡Pedido #${response.pedido_id} procesado con éxito en Aroma & Código! Tu pago con ID de pasarela ${details.id} ha sido registrado.`);
+            } else {
+                alert(response?.message || 'El pago pasó en PayPal pero ocurrió un inconveniente en el servidor.');
+            }
+
+        } catch (err) {
+            console.error("Error al procesar la captura en PayPal o sincronizar con MariaDB:", err);
+            alert("No se pudo completar el procesamiento del pago.");
+        }
     };
 
     if (loading) return <div className="text-center text-amber-900 font-bold p-8">Cargando tu carrito dev...</div>;
@@ -105,14 +162,28 @@ export const CartList = () => {
                             </div>
                         </div>
 
-                        <div className="space-y-3">
+                        <div className="space-y-4">
                             <div className="p-3 bg-white rounded-lg border border-amber-200 text-center text-xs text-amber-800 italic">
                                 🔒 Conexión segura lista para procesar pago.
                             </div>
 
-                            <Button type="button" className="w-full bg-amber-800 hover:bg-amber-950 transition-colors">
-                                Proceder al Pago
-                            </Button>
+                            {/* Inyección de los Botones Dinámicos de PayPal en sustitución del botón estático */}
+                            <div className="z-0 relative">
+                                <PayPalButtons
+                                    style={{
+                                        layout: "vertical",
+                                        color: "gold",
+                                        shape: "rect",
+                                        label: "pay"
+                                    }}
+                                    createOrder={createOrder}
+                                    onApprove={onApprove}
+                                    onError={(err) => {
+                                        console.error("Error directo del SDK de PayPal:", err);
+                                        alert("La pasarela detectó un error al inicializar el pago.");
+                                    }}
+                                />
+                            </div>
                         </div>
                     </div>
 

@@ -1,5 +1,11 @@
 <?php
 // backend/endpoints/pagos.php
+// Permite peticiones desde el origen de tu frontend en React
+header("Access-Control-Allow-Origin: http://localhost:5173");
+// Permite que se envíen datos en formato JSON y cabeceras personalizadas
+header("Access-Control-Allow-Headers: Content-Type, Authorization, X-Requested-With");
+// Permite los métodos HTTP necesarios
+header("Access-Control-Allow-Methods: POST, GET, OPTIONS");
 
 require_once __DIR__ . '/../config/database.php';
 

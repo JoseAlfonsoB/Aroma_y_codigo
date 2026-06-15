@@ -3,7 +3,7 @@
 const BASE_URL = 'http://localhost:8000';
 
 export const apiService = {
-    // Peticiones GET (ej. Obtener productos o el carrito)
+    // Peticiones GET (Ya estaba bien)
     async get(endpoint, params = {}) {
         const url = new URL(`${BASE_URL}/${endpoint}`);
         Object.keys(params).forEach(key => url.searchParams.append(key, params[key]));
@@ -15,9 +15,12 @@ export const apiService = {
         return handleResponse(response);
     },
 
-    // Peticiones POST (ej. Login, Registro, Agregar al carrito, Pago)
+    //  ACTUALIZA TU FUNCIÓN POST PARA QUEDAR ASÍ:
     async post(endpoint, body) {
-        const response = await fetch(`${BASE_URL}/${endpoint}`, {
+        // Usamos new URL para que resuelva de forma limpia la dirección web
+        const url = new URL(endpoint, `${BASE_URL}/`);
+
+        const response = await fetch(url.toString(), {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(body)
@@ -36,11 +39,11 @@ export const apiService = {
     }
 };
 
-// Manejador central de respuestas HTTP
+// Manejador central de respuestas HTTP (Se queda igual)
 async function handleResponse(response) {
     const data = await response.json();
     if (!response.ok) {
         throw new Error(data.message || 'Ocurrió un error en la petición.');
     }
     return data;
-}
+}   
