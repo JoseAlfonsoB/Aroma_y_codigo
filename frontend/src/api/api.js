@@ -1,26 +1,32 @@
 // src/api/api.js
 
-const BASE_URL = 'http://localhost:8000';
+const BASE_URL = '/index.php';
 
 export const apiService = {
-    // Peticiones GET (Ya estaba bien)
+    // 1. Peticiones GET (Corregida la concatenación limpia)
     async get(endpoint, params = {}) {
-        const url = new URL(`${BASE_URL}/${endpoint}`);
-        Object.keys(params).forEach(key => url.searchParams.append(key, params[key]));
+        // Concatenamos el endpoint directamente de forma limpia
+        let url = `${BASE_URL}/${endpoint}`;
 
-        const response = await fetch(url.toString(), {
+        // Si mandas parámetros (como filtros o IDs), los pegamos manualmente con Query Strings
+        const paramKeys = Object.keys(params);
+        if (paramKeys.length > 0) {
+            const queryString = paramKeys
+                .map(key => `${encodeURIComponent(key)}=${encodeURIComponent(params[key])}`)
+                .join('&');
+            url += `?${queryString}`;
+        }
+
+        const response = await fetch(url, {
             method: 'GET',
             headers: { 'Content-Type': 'application/json' }
         });
         return handleResponse(response);
     },
 
-    //  ACTUALIZA TU FUNCIÓN POST PARA QUEDAR ASÍ:
+    // 2. Peticiones POST (Corregida usando Template Strings)
     async post(endpoint, body) {
-        // Usamos new URL para que resuelva de forma limpia la dirección web
-        const url = new URL(endpoint, `${BASE_URL}/`);
-
-        const response = await fetch(url.toString(), {
+        const response = await fetch(`${BASE_URL}/${endpoint}`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(body)
@@ -28,7 +34,7 @@ export const apiService = {
         return handleResponse(response);
     },
 
-    // Peticiones DELETE (ej. Eliminar del carrito)
+    // 3. Peticiones DELETE
     async delete(endpoint, body) {
         const response = await fetch(`${BASE_URL}/${endpoint}`, {
             method: 'DELETE',
@@ -39,11 +45,19 @@ export const apiService = {
     }
 };
 
-// Manejador central de respuestas HTTP (Se queda igual)
+// Manejador central de respuestas HTTP
 async function handleResponse(response) {
-    const data = await response.json();
-    if (!response.ok) {
-        throw new Error(data.message || 'Ocurrió un error en la petición.');
+    // Si la respuesta es un texto plano antes de ser JSON (por errores del hosting)
+    const text = await response.text();
+
+    try {
+        const data = JSON.parse(text);
+        if (!response.ok) {
+            throw new Error(data.message || 'Ocurrió un error en la petición.');
+        }
+        return data;
+    } catch (err) {
+        // Si el hosting responde con un HTML de error o algo raro, lo atrapamos de forma segura
+        throw new Error('Error en el servidor o formato de respuesta inválido.', err);
     }
-    return data;
-}   
+}

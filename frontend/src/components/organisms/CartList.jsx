@@ -78,7 +78,7 @@ export const CartList = () => {
             }));
 
             // 3. Enviamos la petición POST a pagos.php con la estructura exacta que ya tienes escrita
-            const response = await apiService.post('endpoints/pagos.php', {
+            const response = await apiService.post('pagos', {
                 usuario_id: user.id,
                 total: parseFloat(totalOrden),
                 id_transaccion: details.id,
